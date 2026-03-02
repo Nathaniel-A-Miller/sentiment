@@ -46,8 +46,3 @@ if term:
         st.pyplot(fig)
     else:
         st.warning(f"No data found for '{term}' in the '{category}' folder.")
-
-# Note: Ensure your local folder structure matches:
-# /app.py
-# /frequent_words/*.tsv
-# /adjectives/*.tsv
