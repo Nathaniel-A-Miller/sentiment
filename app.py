@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 import glob
 import os
 
-st.title("SentProp Historical Sentiment Tracker")
+st.title("SentProp Historical Sentiment Tracker 1850-2000")
 
 # Category selection
 category = st.selectbox("Choose a category:", ["frequent_words", "adjectives"])
