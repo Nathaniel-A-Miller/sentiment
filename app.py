@@ -6,39 +6,48 @@ import os
 
 st.title("SentProp Historical Sentiment Tracker")
 
+# Category selection
+category = st.selectbox("Choose a category:", ["frequent_words", "adjectives"])
+
 # User input
-term = st.text_input("Enter a word to track:", value="silly").lower()
+term = st.text_input(f"Enter a word from {category}:", value="silly").lower()
 
 if term:
-    files = sorted(glob.glob("*.tsv"))
-    years = []
-    polarities = []
+    # Point to the specific folder
+    folder_path = os.path.join(category, "*.tsv")
+    files = sorted(glob.glob(folder_path))
+    
+    years, polarities = [], []
 
-    # Data extraction
     for file in files:
         try:
-            year = int(os.path.basename(file).split('.')[0])
-            df = pd.read_csv(file, sep='\t', names=['word', 'polarity', 'std_dev'])
+            # Handle filename extraction based on your OS path
+            year_str = os.path.basename(file).split('.')[0]
+            year = int(year_str)
             
+            df = pd.read_csv(file, sep='\t', names=['word', 'polarity', 'std_dev'])
             row = df[df['word'] == term]
+            
             if not row.empty:
                 years.append(year)
                 polarities.append(row['polarity'].values[0])
-        except Exception:
+        except (ValueError, pd.errors.EmptyDataError):
             continue
 
-    # Visualization
     if years:
         fig, ax = plt.subplots(figsize=(10, 5))
-        ax.plot(years, polarities, marker='o', linestyle='-', color='#1f77b4')
-        ax.set_title(f"Sentiment Shift of '{term.capitalize()}' (1850-2000)")
+        ax.plot(years, polarities, marker='o', markersize=4, linewidth=2, color='#2ca02c')
+        ax.axhline(0, color='black', lw=1, ls='--') # Zero line for context
+        ax.set_title(f"Sentiment Shift: '{term.capitalize()}'")
         ax.set_xlabel("Year")
         ax.set_ylabel("Polarity Score")
         ax.grid(True, alpha=0.3)
         
         st.pyplot(fig)
     else:
-        st.warning(f"No data found for the word: '{term}'")
+        st.warning(f"No data found for '{term}' in the '{category}' folder.")
 
-# Instructions to run: 
-# Save as app.py and run 'streamlit run app.py' in your terminal.
+# Note: Ensure your local folder structure matches:
+# /app.py
+# /frequent_words/*.tsv
+# /adjectives/*.tsv
